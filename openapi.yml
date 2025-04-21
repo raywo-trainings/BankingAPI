@@ -1,0 +1,768 @@
+openapi: 3.1.0
+
+info:
+  title: Banking API
+  summary: An API for the RAYBANK
+  version: 2.0.0
+
+servers:
+  - url: 'http://localhost:8080/api/v2'
+    description: Development server URL
+
+tags:
+  - name: Clients
+    description: Clients of the RAYBANK
+  - name: Accounts
+    description: Everything related to accounts, regardless of their type
+  - name: Current Accounts
+    description: Accounts classified as current accounts with the RAYBANK
+  - name: Savings Accounts
+    description: Accounts classified as savings accounts with the RAYBANK
+  - name: Entries
+    description: Entries to be recorded on an account
+
+paths:
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: Retrieves all clients stored in the banking system
+      responses:
+        200:
+          description: A list of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Clients'
+
+    post:
+      tags:
+        - Clients
+      summary: Adds a new client to the banking system
+      requestBody:
+        description: The client data to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Clients'
+        required: true
+      responses:
+        201:
+          description: The provided client was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clients'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+  /clients/{id}:
+    get:
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParameter'
+      summary: Retrieves a client by their ID
+      responses:
+        200:
+          description: The client was successfully found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clients'
+        404:
+          $ref: '#/components/responses/ClientNotFoundError'
+
+    put:
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParameter'
+      summary: Updates a specific client record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Clients'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clients'
+          description: The client information was successfully updated
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        404:
+          $ref: '#/components/responses/ClientNotFoundError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+    delete:
+      tags:
+        - Clients
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParameter'
+      summary: Removes a specific client by their ID
+      responses:
+        204:
+          description: The client was successfully deleted
+        404:
+          $ref: '#/components/responses/ClientNotFoundError'
+        422:
+          $ref: '#/components/responses/AccountsStillExistError'
+
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/OwnerIdParameter'
+      summary: Retrieve all accounts, regardless of their type
+      responses:
+        200:
+          description: A list of all accounts across all account types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+
+  /accounts/{iban}:
+    get:
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Fetch account details using the provided IBAN
+      responses:
+        200:
+          description: The account associated with the specified IBAN was successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Account'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+    delete:
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Delete the account associated with the given IBAN
+      description: |
+        An account can only be deleted if its balance is exactly 0. Any account
+        with a non-zero balance cannot be deleted, and the request will fail.
+      responses:
+        204:
+          description: The account was successfully deleted
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+        422:
+          $ref: '#/components/responses/AccountIsNotZeroError'
+
+  /accounts/{iban}/entries:
+    get:
+      tags:
+        - Accounts
+        - Entries
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Retrieve all transaction entries for the account
+      responses:
+        200:
+          description: |
+            A list of all transaction entries for the specified account.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entry'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+  /accounts/{iban}/deposits:
+    post:
+      tags:
+        - Accounts
+        - Entries
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Create a new deposit for the specified account
+      requestBody:
+        description: Details of the deposit to be added to the account.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entry'
+        required: true
+      responses:
+        201:
+          description: The deposit was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entry'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+  /accounts/{iban}/withdrawals:
+    post:
+      tags:
+        - Accounts
+        - Entries
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Create a new withdrawal from the specified account
+      requestBody:
+        description: Details of the withdrawal to be processed from the account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entry'
+        required: true
+      responses:
+        201:
+          description: The withdrawal was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entry'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+          description: No account was found using the specified IBAN
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+          description: |
+            Withdrawal creation failed due to invalid data, account restrictions,
+            or insufficient funds
+
+  /current-accounts:
+    get:
+      tags:
+        - Current Accounts
+      summary: Retrieve all current accounts held in the banking system
+      responses:
+        200:
+          description: A list of all current accounts in the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CurrentAccount'
+
+    post:
+      tags:
+        - Current Accounts
+      summary: Create a new current account in the banking system
+      requestBody:
+        description: The details for the current account to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentAccount'
+        required: true
+      responses:
+        201:
+          description: The current account has been successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentAccount'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+  /current-accounts/{iban}:
+    get:
+      tags:
+        - Current Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Retrieve a specific current account by its IBAN
+      responses:
+        200:
+          description: The current account associated with the given IBAN was successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentAccount'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+    put:
+      tags:
+        - Current Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Update or replace a specific current account
+      requestBody:
+        description: The updated details for replacing the current account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentAccount'
+        required: true
+      responses:
+        200:
+          description: The current account was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentAccount'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+    delete:
+      tags:
+        - Current Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Delete a specific current account by its IBAN
+      responses:
+        204:
+          description: The current account has been successfully deleted
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+  /savings-accounts:
+    get:
+      tags:
+        - Savings Accounts
+      summary: Retrieve all savings accounts in the banking system
+      responses:
+        200:
+          description: A list of all savings accounts held in the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavingsAccount'
+
+    post:
+      tags:
+        - Savings Accounts
+      summary: Create a new savings account in the banking system
+      requestBody:
+        description: The details of the savings account to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavingsAccount'
+        required: true
+      responses:
+        201:
+          description: The savings account was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsAccount'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+  /savings-accounts/{iban}:
+    get:
+      tags:
+        - Savings Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Retrieve a specific savings account by its IBAN
+      responses:
+        200:
+          description: The savings account associated with the provided IBAN was successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsAccount'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+    put:
+      tags:
+        - Savings Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Update or replace a specific savings account
+      requestBody:
+        description: The updated details for replacing the savings account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavingsAccount'
+        required: true
+      responses:
+        200:
+          description: The savings account was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsAccount'
+        400:
+          $ref: '#/components/responses/SyntacticallyInvalidError'
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+        422:
+          $ref: '#/components/responses/SemanticallyInvalidError'
+
+    delete:
+      tags:
+        - Savings Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountsIBANParameter'
+      summary: Delete a specific savings account by its IBAN
+      responses:
+        204:
+          description: The savings account was successfully deleted
+        404:
+          $ref: '#/components/responses/AccountNotFoundError'
+
+components:
+  schemas:
+    Clients:
+      type: object
+      required:
+        - firstname
+        - lastname
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+          example: 4711
+        firstname:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Max
+        lastname:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Mustermann
+
+    Account:
+      type: object
+      required:
+        - iban
+        - ownerId
+      properties:
+        iban:
+          type: string
+          readOnly: true
+          minLength: 22
+          maxLength: 22
+          example: DE12123456789012345678
+        balance:
+          type: number
+          format: double
+          readOnly: true
+          example: 205.78
+        ownerId:
+          type: number
+          format: int32
+          writeOnly: true
+        owner:
+          $ref: '#/components/schemas/Clients'
+          readOnly: true
+        accountType:
+          type: string
+          enum:
+            - current
+            - savings
+
+    CurrentAccount:
+      allOf:
+        - $ref: '#/components/schemas/Account'
+        - type: object
+          properties:
+            overDraftLimit:
+              type: number
+              format: double
+              minimum: 0
+            overdraftInterestRate:
+              type: number
+              format: float
+              minimum: 0
+              example: 12.5
+              description: |
+                Interest rates are expressed as values ranging from 0 to 100.
+
+    SavingsAccount:
+      allOf:
+        - $ref: '#/components/schemas/Account'
+        - type: object
+          properties:
+            interestRate:
+              type: number
+              format: float
+              minimum: 0
+              example: 1.25
+              description: |
+                Interest rates are expressed as values ranging from 0 to 100.
+
+    Entry:
+      type: object
+      required:
+        - iban
+        - amount
+      properties:
+        id:
+          type: string
+          format: UUID
+          readOnly: true
+        iban:
+          type: string
+          minLength: 22
+          maxLength: 22
+          example: DE12123456789012345678
+          readOnly: true
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          example: 345.12
+        entryDate:
+          type: string
+          format: datetime
+          example: 2025-04-01T10:00+02:00
+        description:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Einzahlung
+        entryType:
+          type: string
+          enum:
+            - deposit
+            - withdraw
+
+    ProblemDetail:
+      description: Problem details defined by RFC-9457 (https://datatracker.ietf.org/doc/rfc9457/)
+      type: object
+      properties:
+        instance:
+          type: string
+          format: uri
+          description: |
+            A URI reference that identifies the specific
+            occurrence of the problem.  It may or may not yield further
+            information if dereferenced.
+        type:
+          type: string
+          format: uri
+          description: |
+            A URI reference [RFC3986] that identifies the
+            problem type.  This specification encourages that, when
+            dereferenced, it provide human-readable documentation for the
+            problem type.  When this member is not present, its value is
+            assumed to be "about:blank".
+          example: about:blank
+        title:
+          type: string
+          description: |
+            A short, human-readable summary of the problem
+            type.  It **SHOULD NOT** change from occurrence to occurrence of the
+            problem, except for purposes of localization (e.g., using
+            proactive content negotiation; see [RFC7231], Section 3.4).
+        detail:
+          type: string
+          description: |
+            A human-readable explanation specific to this
+            occurrence of the problem.
+        status:
+          type: integer
+          format: int32
+          description: |
+            The HTTP status code ([RFC7231], Section 6)
+            generated by the origin server for this occurrence of the problem.
+          minimum: 100
+          maximum: 599
+          example: 404
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Violation'
+
+    Violation:
+      type: object
+      properties:
+        field:
+          type: string
+          example: iban
+        constraint:
+          type: string
+          example: NotNull
+        message:
+          type: string
+          example: Must not be empty
+
+
+  parameters:
+    ClientIdParameter:
+      name: id
+      in: path
+      description: The ID of a client.
+      required: true
+      schema:
+        type: number
+        format: int32
+
+    AccountsIBANParameter:
+      name: iban
+      in: path
+      description: The IBAN of an account.
+      required: true
+      schema:
+        type: string
+
+    EntryIdParameter:
+      name: id
+      in: path
+      description: The ID of an entry (deposit or withdrawal).
+      required: true
+      schema:
+        type: string
+        format: UUID
+
+    FromDateParameter:
+      name: from
+      in: query
+      description: The starting date used for queries
+      required: false
+      schema:
+        type: string
+        format: datetime
+
+    ToDateParameter:
+      name: to
+      in: query
+      description: The end date used for queries
+      required: false
+      schema:
+        type: string
+        format: datetime
+
+    OwnerIdParameter:
+      name: ownerId
+      in: query
+      description: |
+        The client ID used to query accounts associated with the specified client.
+      required: false
+      schema:
+        type: number
+        format: int32
+
+
+  responses:
+    SyntacticallyInvalidError:
+      description: The given entity was invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /client/4711
+            type: about:blank
+            title: The given entity is invalid.
+            details: There are syntax errors in the given entity.
+            status: 400
+            violations: []
+
+    SemanticallyInvalidError:
+      description: The given entity has validation errors.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /client/4711
+            type: about:blank
+            title: The given entity could not be validated.
+            details: The firstname field needs to be at least 1 character long.
+            status: 422
+            violations:
+              - field: firstname
+                constraint: NotNull
+                message: must not be empty
+
+    AccountsStillExistError:
+      description: |
+        The client still has accounts associated with it. Therefore the client 
+        could not be deleted.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /client/4711
+            type: about:blank
+            title: The given client could not be deleted.
+            details: The client has still accounts associated with it.
+            status: 422
+
+    AccountIsNotZeroError:
+      description: |
+        The account’s balance is not 0. Therefor the account could not be 
+        deleted
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /account/DE00100100100100100101
+            type: about:blank
+            title: The given account could not be deleted.
+            details: |
+              The account has still a balance and must be cleared
+              before deletion.
+            status: 422
+
+    AccountNotFoundError:
+      description: An account with the given IBAN could not be found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /account/DE00100100100100100101
+            type: about:blank
+            title: An account with the given IBAN does not exist.
+            details: An account with the given IBAN does not exist.
+            status: 404
+
+    ClientNotFoundError:
+      description: A client with the given ID could not be found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            instance: /client/4711
+            type: about:blank
+            title: A client with the given ID does not exist.
+            details: A client with the given ID does not exist.
+            status: 404
