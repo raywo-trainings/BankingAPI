@@ -35,7 +35,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Clients'
+                  $ref: '#/components/schemas/Client'
 
     post:
       tags:
@@ -46,7 +46,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Clients'
+              $ref: '#/components/schemas/Client'
         required: true
       responses:
         201:
@@ -54,7 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Clients'
+                $ref: '#/components/schemas/Client'
         400:
           $ref: '#/components/responses/SyntacticallyInvalidError'
         422:
@@ -73,7 +73,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Clients'
+                $ref: '#/components/schemas/Client'
         404:
           $ref: '#/components/responses/ClientNotFoundError'
 
@@ -87,14 +87,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Clients'
+              $ref: '#/components/schemas/Client'
         required: true
       responses:
         200:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Clients'
+                $ref: '#/components/schemas/Client'
           description: The client information was successfully updated
         400:
           $ref: '#/components/responses/SyntacticallyInvalidError'
@@ -176,6 +176,8 @@ paths:
         - Entries
       parameters:
         - $ref: '#/components/parameters/AccountsIBANParameter'
+        - $ref: '#/components/parameters/FromDateParameter'
+        - $ref: '#/components/parameters/ToDateParameter'
       summary: Retrieve all transaction entries for the account
       responses:
         200:
@@ -442,7 +444,7 @@ paths:
 
 components:
   schemas:
-    Clients:
+    Client:
       type: object
       required:
         - firstname
@@ -469,6 +471,11 @@ components:
       required:
         - iban
         - ownerId
+      discriminator:
+        propertyName: accountType
+        mapping:
+          current: '#/components/schemas/CurrentAccount'
+          savings: '#/components/schemas/SavingsAccount'
       properties:
         iban:
           type: string
@@ -486,7 +493,7 @@ components:
           format: int32
           writeOnly: true
         owner:
-          $ref: '#/components/schemas/Clients'
+          $ref: '#/components/schemas/Client'
           readOnly: true
         accountType:
           type: string
@@ -547,7 +554,7 @@ components:
           example: 345.12
         entryDate:
           type: string
-          format: datetime
+          format: date-time
           example: 2025-04-01T10:00+02:00
         description:
           type: string
@@ -655,7 +662,7 @@ components:
       required: false
       schema:
         type: string
-        format: datetime
+        format: date-time
 
     ToDateParameter:
       name: to
@@ -664,7 +671,7 @@ components:
       required: false
       schema:
         type: string
-        format: datetime
+        format: date-time
 
     OwnerIdParameter:
       name: ownerId
