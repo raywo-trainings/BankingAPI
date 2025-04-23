@@ -6,9 +6,15 @@
     <variables>
         <primary-color>#14213D</primary-color>
         <custom-css>custom.css</custom-css>
+        <custom-favicons>favicon.svg</custom-favicons>
+        <header-logo>logo.svg</header-logo>
     </variables>
     <footer>
         <copyright>2025, Ray Wojciechowski</copyright>
+        <social type="github"
+                href="https://github.com/raywo-trainings/BankingAPI">
+            Repository on GitHub
+        </social>
     </footer>
     <build-profile instance="bank-api">
         <variables>
