@@ -26,7 +26,8 @@ paths:
     get:
       tags:
         - Clients
-      summary: Retrieves all clients stored in the banking system
+      summary: Retrieve all clients stored in the banking system
+      description: Some long description text
       responses:
         200:
           description: A list of customers
@@ -568,7 +569,8 @@ components:
             - withdraw
 
     ProblemDetail:
-      description: Problem details defined by RFC-9457 (https://datatracker.ietf.org/doc/rfc9457/)
+      description: |
+        Problem details defined by [RFC-9457](https://datatracker.ietf.org/doc/rfc9457/)
       type: object
       properties:
         instance:
@@ -615,6 +617,8 @@ components:
             $ref: '#/components/schemas/Violation'
 
     Violation:
+      description: |
+        Describes the violation that was found during field validation.
       type: object
       properties:
         field:

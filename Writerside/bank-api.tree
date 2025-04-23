@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="bank-api"
+                  name="BankAPI Reference" start-page="API_Reference.md">
+
+    <toc-element topic="API_Reference.md">
+        <toc-element topic="Clients.md">
+            <toc-element topic="Retrieves_all_clients_stored_in_the_banking_system.md"/>
+            <toc-element topic="Retrieves_a_client_by_their_ID.md"/>
+            <toc-element topic="Adds_a_new_client_to_the_banking_system.md"/>
+            <toc-element topic="Updates_a_specific_client_record.md"/>
+            <toc-element topic="Removes_a_specific_client_by_their_ID.md"/>
+        </toc-element>
+        <toc-element topic="Accounts.md">
+            <toc-element topic="Retrieve_all_accounts_regardless_of_their_type.md"/>
+            <toc-element topic="Fetch_account_details_using_the_provided_IBAN.md"/>
+            <toc-element topic="Delete_the_account_associated_with_the_given_IBAN.md"/>
+            <toc-element topic="Savings-accounts.md">
+                <toc-element topic="Retrieve_all_savings_accounts_in_the_banking_system.md"/>
+                <toc-element topic="Create_a_new_savings_account_in_the_banking_system.md"/>
+                <toc-element topic="Retrieve_a_specific_savings_account_by_its_IBAN.md"/>
+                <toc-element topic="Update_or_replace_a_specific_savings_account.md"/>
+                <toc-element topic="Delete_a_specific_savings_account_by_its_IBAN.md"/>
+            </toc-element>
+            <toc-element topic="Current-accounts.md">
+                <toc-element topic="Retrieve_all_current_accounts_held_in_the_banking_system.md"/>
+                <toc-element topic="Retrieve_a_specific_current_account_by_its_IBAN.md"/>
+                <toc-element topic="Update_or_replace_a_specific_current_account.md"/>
+                <toc-element topic="Delete_a_specific_current_account_by_its_IBAN.md"/>
+                <toc-element topic="Create_a_new_current_account_in_the_banking_system.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element topic="Entries.md">
+            <toc-element topic="Retrieve_all_transaction_entries_for_the_account.md"/>
+            <toc-element topic="Create_a_new_deposit_for_the_specified_account.md"/>
+            <toc-element topic="Create_a_new_withdrawal_from_the_specified_account.md"/>
+        </toc-element>
+        <toc-element topic="Schemas.md">
+            <toc-element topic="Client.md"/>
+            <toc-element topic="Account.md"/>
+            <toc-element topic="CurrentAccount.md"/>
+            <toc-element topic="SavingsAccount.md"/>
+            <toc-element topic="Entry.md"/>
+            <toc-element topic="ProblemDetail.md"/>
+            <toc-element topic="Violation.md"/>
+        </toc-element>
+    </toc-element>
+</instance-profile>

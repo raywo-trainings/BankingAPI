@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Commissioner:wght@100..900&display=swap');
+
+:root {
+  --app-header: #14213D;
+  --app-footer: #14213D;
+  --rs-text-1-font-size: 1rem;
+  --rs-text-2-font-size: 1rem;
+  --rs-text-3-font-size: 1rem;
+  --rs-h4-font-size: 1.5rem;
+  --wh-color-accent-substrate-main-text: #FCA311;
+  --wh-color-success: #28a745;
+  --wh-color-error: #dc3545;
+
+  --rs-font-family-ui: Comissioner, sans-serif;
+}
+
+.api-endpoint .copier__content {
+  font-size: var(--rs-text-3-font-size);
+}
+
+.toc-item--selected, .toc-item--selected {
+  --wh-color-white: var(--wh-color-accent-substrate-main-text);
+}
+
+.api-parameter__status-code--error {
+  color: var(--wh-color-error);
+}
