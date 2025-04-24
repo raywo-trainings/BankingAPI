@@ -3,7 +3,7 @@
         SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
 
 <instance-profile id="bank-api"
-                  name="BankAPI Reference" start-page="API_Reference.md">
+                  name="RAYBANK – API Reference" start-page="API_Reference.md">
 
     <toc-element topic="API_Reference.md">
         <toc-element topic="Clients.md">
